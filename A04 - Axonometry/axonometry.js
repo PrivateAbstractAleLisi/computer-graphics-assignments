@@ -1,3 +1,7 @@
+function degToRad(angle) {
+	return angle * 180 / Math.PI;
+}
+
 function axonometry() {
 
 			
@@ -10,7 +14,7 @@ function axonometry() {
 
 	var proj = [	1/w,			0.0,		0.0,				0.0,
 			   		0.0,			a/w,		0.0,				0.0,
-			   		0.0,			0.0,		-2/(f-n),		-((f+n)/(f-n)),
+			   		0.0,			0.0,		-2/(f+n),		-((f+n)/(f-n)),
 			   		0.0,			0.0,		0.0,				1.0];
 
 
@@ -47,7 +51,7 @@ function axonometry() {
 /*	//all angles alpha, beta ar arbitrary
 */			   
 	// Make a trimetric view, w = 50, a = 16/9, n = 1, f = 101, rotated -30 around the x-axis and 30 around the y-axis
-	var A3 = utils.multiplyMatrices (utils.multiplyMatrices(proj, utils.MakeRotateXMatrix(30)), utils.MakeRotateYMatrix(-30));
+	var A3 = utils.multiplyMatrices (utils.multiplyMatrices(proj, utils.MakeRotateXMatrix(-30)), utils.MakeRotateYMatrix(30));
 			   
 
 
@@ -55,13 +59,10 @@ function axonometry() {
 
 	//I'll create the 2 shear matrix for these last two projections
 
-	var sh1 =  [1,		0.0,		-1*Math.cos(45),		0.0,
-			   0.0,		1,			-1*Math.sin(45),		0.0,
-			   0.0,		0.0,		1,						0.0,
-			   0.0,		0.0,		0.0,					1.0];
+	var sh1 = utils.MakeShearZMatrix(-Math.cos(utils.degToRad(45)), -Math.sin(utils.degToRad(45)));
 
-	var sh2 =  [1,		0.0,		-0.5*Math.cos(45),		0.0,
-			   0.0,		1,			-0.5*Math.sin(45),		0.0,
+	var sh2 =  [1,		0.0,		-0.5*Math.cos(degToRad(60)),		0.0,
+			   0.0,		1,			-0.5*Math.sin(degToRad(60)),		0.0,
 			   0.0,		0.0,		1,						0.0,
 			   0.0,		0.0,		0.0,					1.0];
 
