@@ -1,10 +1,16 @@
-const granularity = 9;
+const granularity = 30;
 
 //from x in a,b to y in c,d
 function mapToRange(X, A, B, C, D) {
     return (X - A) / (B - A) * (D - C) + C;
 }
 
+function map2Range(X, A, B, C, D) {
+
+    let offset = C;
+    let ratio = (D - C) / (B - A);
+    return ratio * (X - A) + offset;
+}
 function buildSinCos() {
 
 
@@ -26,22 +32,76 @@ function buildSinCos() {
 
     return vertices;
 }
-function buildHalfSphere(radius, detail) {
-    for (let r = 0; r < radius; r++) {
-        
+
+function circle(x, y) {
+    return x * x + y * y;
+}
+
+function buildHalfSphere(detail) {
+    var pos = 0
+    var vertices = [];
+    let rPow2 = 9
+    for (let i = 0; i < detail; i++) {
+        for (let j = 0; j < detail; j++) {
+
+            var x = map2Range(i, 0.0, detail-1, -3.0, 3.0);
+            var z = map2Range(j, 0.0, detail-1, -3.0, 3.0);
+
+            if (circle(x, z) <= rPow2) {
+                let y = Math.sqrt(rPow2 - x * x - z * z);
+                vertices[pos] = [x, y, z]
+                pos = pos + 1;
+            }
+
+        }
     }
+    return vertices
+}
+
+function degToRad(deg) {
+    return Math.PI * deg / 180.0;
+}
+function halfSphere(density) {
+
+    var vertices = [];
+    var pos = 0;
+    for (let theta = 0.0; theta < density; theta++) {
+        let vth = theta * (Math.PI / density)
+        for (let phi = 0; phi < density; phi++) {
+            let vphi = phi * (Math.PI/ density)
+            let x = Math.sin(vth) * Math.cos(vphi)
+            let y = Math.sin(vth) * Math.sin(vphi)
+            let z = Math.cos(vth)
+
+            vertices[pos] = [x,y ,  z];
+            pos ++
+
+        }
+    }
+
+    /*dump
+    var dumped = []
+    var pos = 0
+    for (let theta = 0.0; theta < density; theta++) {
+        for (let phi = -density; phi < density; phi++) {
+            dumped[pos] = vertices[theta][phi + density];
+            pos = pos +1;
+        }
+    }*/
+    return vertices;
+
 }
 function toTris(vertices) {
     var trisList = []
     var pos = 0;
-    for (let i = 0; i < granularity-1; i++) {
-        for (let j = 0; j < granularity-1; j++) {
+    for (let i = 0; i < granularity - 1; i++) {
+        for (let j = 0; j < granularity - 1; j++) {
 
             //get the vertex in position (i,j) and map a square having (i,j) as a bottom, left vertex
             let bottom_left = (i * granularity) + j;
-            let bottom_right = bottom_left+1;
+            let bottom_right = bottom_left + 1;
             let top_left = bottom_left + granularity;
-            let top_right = top_left+1;
+            let top_right = top_left + 1;
 
             //split the square into two tris
             //let lowerTri = [bottom_left, bottom_right, top_left] // I\
@@ -51,20 +111,40 @@ function toTris(vertices) {
             //pos = pos + 2
             //upper
             trisList[pos] = bottom_left;
-            trisList[pos+1] = bottom_right;
-            trisList[pos+2] = top_left;
+            trisList[pos + 1] = bottom_right;
+            trisList[pos + 2] = top_left;
             //lower
-            trisList[pos+3] = bottom_right;
-            trisList[pos+4] = top_right;
-            trisList[pos+5] = top_left;
+            trisList[pos + 3] = bottom_right;
+            trisList[pos + 4] = top_right;
+            trisList[pos + 5] = top_left;
             pos = pos + 6;
         }
     }
     return trisList
 }
+function sphereToTris(sphere, density) {
+    var tri = [];
+    var pos = 0;
+    for (let ntita = 0.0; ntita < density; ntita++) {
+        for (let nphi = 0; nphi < density; nphi++) {
 
+            let current = ntita*density + nphi;
+            let base = ntita*density;
+            tri[pos] = current
+            tri[pos+1] = current + 1
+            tri[pos+2] = (ntita-1)*density + nphi
+            pos += 3
+
+            tri[pos] =   current + 1
+            tri[pos+1] = (ntita-1)*density + nphi +1
+            tri[pos+2] = (ntita-1)*density + nphi
+            pos += 3
+        }
+    }
+    return tri
+}
 function buildGeometry() {
-    var i;
+
 
 
     // Draws function y = sin(x) * cos(z) with -3 <= x <= 3 and -3 <= z <= 3.
@@ -72,49 +152,17 @@ function buildGeometry() {
     var vert2 = buildSinCos();
     var ind2 = toTris(vert2);
 
-    /*////* Creates indices
-    var ind2 = [];
-    for (i = 0; i < 2; i++) {
-        for (j = 0; j < 2; j++) {
-            ind2[6 * (i * 2 + j)] = 3 * j + i;
-            ind2[6 * (i * 2 + j) + 1] = 3 * j + i + 1;
-            ind2[6 * (i * 2 + j) + 2] = 3 * (j + 1) + i + 1;
-            ind2[6 * (i * 2 + j) + 3] = 3 * j + i;
-            ind2[6 * (i * 2 + j) + 4] = 3 * (j + 1) + i + 1;
-            ind2[6 * (i * 2 + j) + 5] = 3 * (j + 1) + i;
-        }
-    } */
-
 
     var color2 = [0.0, 0.0, 1.0];
     addMesh(vert2, ind2, color2);
-
-
     // Draws a Half Sphere
     ///// Creates vertices
-    var vert3 = [];
-    for (i = 0; i <= 2; i++) {
-        for (j = 0; j <= 2; j++) {
-            x = i - 1;
-            z = j - 1;
-            vert3[i * 3 + j] = [x, Math.cos(3.14 * (x - z)), z];
-        }
-    }
+    let d = 5;
+    var vert3 = halfSphere(d, 3);
+    var ind3 = sphereToTris(vert3, d)
 
-    ////// Creates indices
-    var ind3 = [];
-    for (i = 0; i < 2; i++) {
-        for (j = 0; j < 2; j++) {
-            ind3[6 * (i * 2 + j)] = 3 * j + i;
-            ind3[6 * (i * 2 + j) + 1] = 3 * j + i + 1;
-            ind3[6 * (i * 2 + j) + 2] = 3 * (j + 1) + i + 1;
-            ind3[6 * (i * 2 + j) + 3] = 3 * j + i;
-            ind3[6 * (i * 2 + j) + 4] = 3 * (j + 1) + i + 1;
-            ind3[6 * (i * 2 + j) + 5] = 3 * (j + 1) + i;
-        }
-    }
 
-    var color3 = [0.0, 1.0, 0.0];
+    var color3 = [0.0, 0.15, 0.8];
     addMesh(vert3, ind3, color3);
 }
 
