@@ -41,7 +41,17 @@ var S1 = `
 
 // Lambert diffuse and Blinn specular. No ambient and emission.
 var S2 = `
-	out_color = vec4(1.0, 0.0, 0.0, 1.0);
+
+	vec4 specContrA = pow(dot(normalVec, normalize(lightDirA + eyedirVec)), SpecShine) * lightColorA * specularColor ;
+	vec4 specContrB = pow(dot(normalVec, normalize(lightDirB + eyedirVec)), SpecShine) * lightColorB * specularColor;
+	vec4 specContrC = pow(dot(normalVec, normalize(lightDirC + eyedirVec)), SpecShine) * lightColorC * specularColor;
+	
+	vec4 diffContrA = diffColor  * dot(lightDirA, normalVec);
+	vec4 diffContrB = diffColor  * dot(lightDirB, normalVec);
+	vec4 diffContrC = diffColor  * dot(lightDirC, normalVec);
+	
+	out_color = clamp( diffContrA + specContrA + diffContrB + specContrB + diffContrC + specContrC , 
+					0.0, 1.0);
 `;
 
 // Ambient and Phong specular. No emssion and no diffuse.
