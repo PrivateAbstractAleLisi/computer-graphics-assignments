@@ -46,27 +46,105 @@ var S2 = `
 	vec4 specContrB = pow(dot(normalVec, normalize(lightDirB + eyedirVec)), SpecShine) * lightColorB * specularColor;
 	vec4 specContrC = pow(dot(normalVec, normalize(lightDirC + eyedirVec)), SpecShine) * lightColorC * specularColor;
 	
-	vec4 diffContrA = diffColor  * dot(lightDirA, normalVec);
-	vec4 diffContrB = diffColor  * dot(lightDirB, normalVec);
-	vec4 diffContrC = diffColor  * dot(lightDirC, normalVec);
+	vec4 diffContrA = diffColor  * dot(lightDirA, normalVec) * lightColorA ;
+	vec4 diffContrB = diffColor  * dot(lightDirB, normalVec) * lightColorB;
+	vec4 diffContrC = diffColor  * dot(lightDirC, normalVec) * lightColorC;
 	
 	out_color = clamp( diffContrA + specContrA + diffContrB + specContrB + diffContrC + specContrC , 
 					0.0, 1.0);
 `;
 
+
 // Ambient and Phong specular. No emssion and no diffuse.
 var S3 = `
-	out_color = vec4(1.0, 1.0, 0.0, 1.0);
+
+	vec4 ambientCo = ambientLight * ambColor;
+
+
+	vec3 reflA = -reflect(lightDirA, normalVec);
+	float LRA = max(dot(reflA, eyedirVec), 0.0);
+	vec4 specularPhongA = specularColor * pow(LRA, SpecShine);
+
+	vec3 reflB = -reflect(lightDirB, normalVec);
+	float LRB = max(dot(reflB, eyedirVec), 0.0);
+	vec4 specularPhongB = specularColor * pow(LRB, SpecShine);
+
+	vec3 reflC = -reflect(lightDirC, normalVec);
+	float LRC = max(dot(reflC, eyedirVec), 0.0);
+	vec4 specularPhongC = specularColor * pow(LRC, SpecShine);
+
+
+	vec4 phongSpecular = lightColorA * specularPhongA + lightColorB * specularPhongB + lightColorC * specularPhongC;
+
+	out_color = clamp( ambientCo + phongSpecular , 
+					0.0, 1.0);
+
 `;
 
 // Diffuse, ambient, emission and Phong specular.
 var S4 = `
-	out_color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	// AMBIENT //
+
+	vec4 ambientCo = ambientLight * ambColor; 
+
+
+	// PHONG SPECULAR //
+	vec3 reflA = -reflect(lightDirA, normalVec);
+	float LRA = max(dot(reflA, eyedirVec), 0.0);
+	vec4 specularPhongA = specularColor * pow(LRA, SpecShine);
+
+	vec3 reflB = -reflect(lightDirB, normalVec);
+	float LRB = max(dot(reflB, eyedirVec), 0.0);
+	vec4 specularPhongB = specularColor * pow(LRB, SpecShine);
+
+	vec3 reflC = -reflect(lightDirC, normalVec);
+	float LRC = max(dot(reflC, eyedirVec), 0.0);
+	vec4 specularPhongC = specularColor * pow(LRC, SpecShine);
+
+	vec4 phongSpecular = lightColorA * specularPhongA + lightColorB * specularPhongB + lightColorC * specularPhongC;
+
+	//DIFFUSE
+
+	vec4 diffContrA = diffColor  * dot(lightDirA, normalVec) * lightColorA;
+	vec4 diffContrB = diffColor  * dot(lightDirB, normalVec) * lightColorB;
+	vec4 diffContrC = diffColor  * dot(lightDirC, normalVec) * lightColorC;
+
+	vec4 diffuse = diffContrA + diffContrB + diffContrC;
+
+	//with EMISSION (emit)
+
+	out_color = clamp( ambientCo + phongSpecular + diffuse + emit, 
+					0.0, 1.0);
 `;
 
 // Ambient, Toon diffuse and and Toon (Blinn based) specular. No emssion.
 var S5 = `
-	out_color = vec4(0.0, 0.0, 1.0, 1.0);
+	
+	vec4 ambientCo = ambientLight * ambColor; 
+
+	//float DToonTh;		// Threshold for diffuse in a toon shader
+	//float SToonTh;		// Threshold for specular in a toon shader
+
+	//DIFFUSE TOON
+
+	vec4 diffContrA = lightColorA * diffColor  * dot(lightDirA, normalVec)  * (dot(lightDirA, normalVec) > DToonTh ? diffColor : vec4(0,0,0,0));
+	vec4 diffContrB = lightColorB * diffColor * dot(lightDirB, normalVec) * (dot(lightDirB, normalVec) > DToonTh ? diffColor : vec4(0,0,0,0));
+	vec4 diffContrC = lightColorC * diffColor  * dot(lightDirC, normalVec) * (dot(lightDirC, normalVec) > DToonTh ? diffColor : vec4(0,0,0,0));
+	
+
+	//SPECULAR
+
+
+	vec4 specContrA = diffColor  * ((dot(normalVec, normalize(lightDirA + eyedirVec)) ) > SToonTh ?  specularColor : vec4(0,0,0,0)) * lightColorA;
+	vec4 specContrB = diffColor  * ((dot(normalVec, normalize(lightDirB + eyedirVec)) ) > SToonTh ?  specularColor : vec4(0,0,0,0)) * lightColorB;
+	vec4 specContrC = diffColor  * ((dot(normalVec, normalize(lightDirC + eyedirVec)) ) > SToonTh ?  specularColor : vec4(0,0,0,0)) * lightColorC;
+
+	out_color = ambientCo + diffContrA + diffContrB + diffContrC
+	+ specContrA + specContrB + specContrC;
+
+
+
 `;
 
 	return [S1, S2, S3, S4, S5];
