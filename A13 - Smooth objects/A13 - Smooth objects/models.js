@@ -174,12 +174,52 @@ function buildGeometry() {
 	// ============================================================================ //
 
 
-
-	
 	// Draws a Cylinder --- To do for the assignment
-	var vert4 = [[-1.0,-1.0,0.0, 0.0, 0.0,1.0], [1.0,-1.0,0.0, 0.0, 0.0,1.0], [1.0,1.0,0.0, 0.0, 0.0,1.0], [-1.0,1.0,0.0, 0.0, 0.0,1.0]];
-	var ind4 = [0, 1, 2,  0, 2, 3];
-	var color4 = [1.0, 1.0, 0.0];
+
+	//upper and lower centers
+	var vert4 = [[0.0, 1.0, 0.0, 0.0, 1.0, 0.0]];
+	vert4[145] = [0.0, -1.0, 0.0, 0.0, -1.0, 0.0];
+
+	for(i = 0; i < 36; i++) {
+
+		const step = Math.PI*16.0*i/180.0;
+		//upper ring
+		vert4[i+1] = [Math.sin(step), 1.0, Math.cos(step), 0.0, 1.0, 0.0];
+
+		//upper ring - horizontal normals (perpendicular to the last ones)
+		vert4[i+37] = [Math.sin(step), 1.0, Math.cos(step), Math.sin(step), 0.0, Math.cos(step)];
+
+		vert4[i+73] = [Math.sin(step),-1.0, Math.cos(step), Math.sin(step), 0.0, Math.cos(step)];
+		vert4[i+109] = [Math.sin(step),-1.0, Math.cos(step), 0.0, -1.0, 0.0];
+	}
+
+
+	////// INDICES ////////
+	var ind4 = [];
+
+	j = 0;
+	for(i = 0; i < 36; i++) { //triangle fan for the upper circle
+		ind4[j++] = 0;
+		ind4[j++] = i + 1;
+		ind4[j++] = (i + 1) % 36 + 1;
+	}
+
+	for(i = 0; i < 36; i++) { //triangle fan for the lower circle
+		ind4[j++] = 145;
+		ind4[j++] = (i + 1) % 36 + 109;
+		ind4[j++] = i + 109;
+	}
+
+	for(i = 0; i < 36; i++) { //body
+		ind4[j++] = i + 73;
+		ind4[j++] = (i + 1) % 36 + 37;
+		ind4[j++] = i + 37;
+
+		ind4[j++] = (i + 1) % 36 + 37;
+		ind4[j++] = i + 73;
+		ind4[j++] = (i + 1) % 36 + 73;
+	}
+	let color4 = [1.0, 0.45, 0.7];
 	addMesh(vert4, ind4, color4);
 
 	// Draws a Sphere --- To do for the assignment.
