@@ -51,13 +51,7 @@ function toTris(vertices) {
             let top_left = bottom_left + granularity;
             let top_right = top_left + 1;
 
-            //split the square into two tris
-            //let lowerTri = [bottom_left, bottom_right, top_left] // I\
-            //let upperTri = [top_left, top_right, bottom_right]   // \I
-            //trisList[pos] = lowerTri;
-            //trisList[pos+1] = upperTri;
-            //pos = pos + 2
-            //upper
+
             trisList[pos] = bottom_left;
             trisList[pos + 1] = bottom_right;
             trisList[pos + 2] = top_left;
