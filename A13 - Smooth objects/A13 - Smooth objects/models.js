@@ -138,26 +138,11 @@ function buildGeometry() {
 
 			var y = Math.sin((x)) * Math.cos((z))
 
-
-
-            //unit normal vector
-
-			/*
-			let dI = [0, Math.cos((x)) * Math.cos((z)), z]; //rispetto ad X
-			let dJ = [x, (-1) * Math.sin((x)) * Math.sin((z)), 0]; //rispetto a Z
-
-            let crossp = crossProduct(dJ, dI)
-
-            let normlzed = normalizeVector(crossp)
-
-            vert3[pos] = [x, y, z, normlzed[0],normlzed[1],normlzed[2] ]; */
-
-			//gradient F = 0 = Math.sin((x)) * Math.cos((z)) - y
 			let Fx = Math.cos(x) * Math.cos(z)
 			let Fz = Math.sin(x) * (-Math.sin(z))
 			let Fy = -1
 
-			let norma = normalizeVector([Fx, Fy, Fz])
+			let norma = normalizeVector([-Fx, -Fy, -Fz])
 			vert3[pos] = [x, y, z, norma[0],norma[1],norma[2] ];
             pos = pos + 1;
         }
@@ -180,52 +165,55 @@ function buildGeometry() {
 	var vert4 = [[0.0, 1.0, 0.0, 0.0, 1.0, 0.0]];
 	vert4[145] = [0.0, -1.0, 0.0, 0.0, -1.0, 0.0];
 
-	for(i = 0; i < 36; i++) {
+	{
+		for (i = 0; i < 36; i++) {
 
-		const step = Math.PI*16.0*i/180.0;
-		//upper ring
-		vert4[i+1] = [Math.sin(step), 1.0, Math.cos(step), 0.0, 1.0, 0.0];
+			const step = Math.PI * 16.0 * i / 180.0;
+			//upper ring
+			vert4[i + 1] = [Math.sin(step), 1.0, Math.cos(step), 0.0, 1.0, 0.0];
 
-		//upper ring - horizontal normals (perpendicular to the last ones)
-		vert4[i+37] = [Math.sin(step), 1.0, Math.cos(step), Math.sin(step), 0.0, Math.cos(step)];
+			//upper ring - horizontal normals (perpendicular to the last ones)
+			vert4[i + 37] = [Math.sin(step), 1.0, Math.cos(step), Math.sin(step), 0.0, Math.cos(step)];
 
-		vert4[i+73] = [Math.sin(step),-1.0, Math.cos(step), Math.sin(step), 0.0, Math.cos(step)];
-		vert4[i+109] = [Math.sin(step),-1.0, Math.cos(step), 0.0, -1.0, 0.0];
+			vert4[i + 73] = [Math.sin(step), -1.0, Math.cos(step), Math.sin(step), 0.0, Math.cos(step)];
+			vert4[i + 109] = [Math.sin(step), -1.0, Math.cos(step), 0.0, -1.0, 0.0];
+		}
+
+
+		////// INDICES ////////
+		var ind4 = [];
+
+		j = 0;
+		for (i = 0; i < 36; i++) { //triangle fan for the upper circle
+			ind4[j++] = 0;
+			ind4[j++] = i + 1;
+			ind4[j++] = (i + 1) % 36 + 1;
+		}
+
+		for (i = 0; i < 36; i++) { //triangle fan for the lower circle
+			ind4[j++] = 145;
+			ind4[j++] = (i + 1) % 36 + 109;
+			ind4[j++] = i + 109;
+		}
+
+		for (i = 0; i < 36; i++) { //body
+			ind4[j++] = i + 73;
+			ind4[j++] = (i + 1) % 36 + 37;
+			ind4[j++] = i + 37;
+
+			ind4[j++] = (i + 1) % 36 + 37;
+			ind4[j++] = i + 73;
+			ind4[j++] = (i + 1) % 36 + 73;
+		}
+		let color4 = [1.0, 0.45, 0.7];
+		addMesh(vert4, ind4, color4);
 	}
-
-
-	////// INDICES ////////
-	var ind4 = [];
-
-	j = 0;
-	for(i = 0; i < 36; i++) { //triangle fan for the upper circle
-		ind4[j++] = 0;
-		ind4[j++] = i + 1;
-		ind4[j++] = (i + 1) % 36 + 1;
-	}
-
-	for(i = 0; i < 36; i++) { //triangle fan for the lower circle
-		ind4[j++] = 145;
-		ind4[j++] = (i + 1) % 36 + 109;
-		ind4[j++] = i + 109;
-	}
-
-	for(i = 0; i < 36; i++) { //body
-		ind4[j++] = i + 73;
-		ind4[j++] = (i + 1) % 36 + 37;
-		ind4[j++] = i + 37;
-
-		ind4[j++] = (i + 1) % 36 + 37;
-		ind4[j++] = i + 73;
-		ind4[j++] = (i + 1) % 36 + 73;
-	}
-	let color4 = [1.0, 0.45, 0.7];
-	addMesh(vert4, ind4, color4);
 
 	// Draws a Sphere --- To do for the assignment.
 	var vert5 = [[-1.0,-1.0,0.0, 0.0, 0.0,1.0], [1.0,-1.0,0.0, 0.0, 0.0,1.0], [1.0,1.0,0.0, 0.0, 0.0,1.0], [-1.0,1.0,0.0, 0.0, 0.0,1.0]];
 	var ind5 = [0, 1, 2,  0, 2, 3];
 	var color5 = [1.0, 0.0, 0.0];
 	addMesh(vert5, ind5, color5);
+
 }
 
