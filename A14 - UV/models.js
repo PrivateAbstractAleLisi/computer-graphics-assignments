@@ -1,3 +1,10 @@
+function computeCilNorm (i) {
+    dx = Math.sin(i/18.0*Math.PI);
+    dz = Math.cos(i/18.0*Math.PI);
+    res = [dx, 0.0, dz];
+    return res
+}
+
 function buildGeometry() {
     var i, j;
     // Draws a pyramid --- To complete for the assignment. This is just the one in Assignment 13, where two 0.1, 0.1 UV components have been added to the vertices definitions. Such number must be replaced (differently for each vertexes), to obtain a proper Egyptian Pyramid
@@ -94,115 +101,79 @@ function buildGeometry() {
     }
 
 
-    /* Draws a Cylinder --- To do for the assignment
-    //upper and lower centers
-    var vert3 = [[0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.625, 0.875]];
-    vert3[145] = [0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.875,0.875];
+// Draws a Cylinder --- To do for the assignment
+    var vert3 = [[0.0, 1.5, 0.0, 0.0, 1.0, 0.0, 0.625, 0.875]];
+    k = 1;
+    var dparts = 0.5/36;
+    var position = 0;
 
-    {
-        for (i = 0; i < 36; i++) {
-
-            const step = Math.PI * 16.0 * i / 180.0;
-            //upper ring
-
-            let radius = 0.75-0.625
-            let u = 0.625 + (radius)*Math.cos(step)
-            let v = 0.875 + (radius)*Math.sin(step)
-
-            vert3[i + 1] = [Math.sin(step), 1.0, Math.cos(step), 0.0, 1.0, 0.0, u, v];
-
-            //upper ring - horizontal normals (perpendicular to the last ones)
-            let u_lin = 1 -  0.5*i/35.0
-            let u_lin2 = 0.5 +  0.5*i/35.0
-
-            vert3[i + 37] = [Math.sin(step), 1.0, Math.cos(step), Math.sin(step), 0.0, Math.cos(step), u_lin2, 0.75];
-
-
-            let u_low = 0.875 + (radius)*Math.cos(step)
-            let v_low = 0.875 + (radius)*Math.sin(step)
-
-            //lower ring, same
-            vert3[i + 73] = [Math.sin(step), -1.0, Math.cos(step), Math.sin(step), 0.0, Math.cos(step), u_lin2, 0.5];
-
-            vert3[i + 109] = [Math.sin(step), -1.0, Math.cos(step), 0.0, -1.0, 0.0, u_low, v_low];
-        }
-
-
-        ////// INDICES ////////
-        var ind3 = [];
-
-        j = 0;
-        for (i = 0; i < 36; i++) { //triangle fan for the upper circle
-            ind3[j++] = 0;
-            ind3[j++] = i + 1;
-            ind3[j++] = (i + 1) % 36 + 1;
-        }
-
-        for (i = 0; i < 36; i++) { //triangle fan for the lower circle
-            ind3[j++] = 145;
-            ind3[j++] = (i + 1) % 36 + 109;
-            ind3[j++] = i + 109;
-        }
-
-        for (i = 0; i < 36; i++) { //body
-            ind3[j++] = i + 73;
-            ind3[j++] = (i + 1) % 36 + 37;
-            ind3[j++] = i + 37;
-
-            ind3[j++] = (i + 1) % 36 + 37;
-            ind3[j++] = i + 73;
-            ind3[j++] = (i + 1) % 36 + 73;
-        }
-        let color3 = [1.0, 0.45, 0.7];
-        addMesh(vert3, ind3, color3);
-    } */
-
-    // Draws a Cylinder --- Already done, just for inspiration
-    ///// Creates vertices
-    var vert3 = [[0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.625, 0.875]];
-    for(i = 0; i < 36; i++) {
-
-        let step = i*10.0/180.0*Math.PI;
-        let radius = 0.75-0.625
-        let u = 0.625 + (radius)*Math.cos(step)
-        let v = 0.875 + (radius)*Math.sin(step)
-        let u_low = 0.875 + (radius)*Math.cos(step)
-        let v_low = 0.875 + (radius)*Math.sin(step)
-        let u_lin2 = 0.5 +  0.5*i/35.0
-
-        vert3[i+1] = [Math.sin(i*10.0/180.0*Math.PI), 1.0, Math.cos(i*10.0/180.0*Math.PI), 0.0, 1.0, 0.0, u, v];
-        vert3[i+37] = [Math.sin(i*10.0/180.0*Math.PI), 1.0, Math.cos(i*10.0/180.0*Math.PI), Math.sin(i*10.0/180.0*Math.PI), 0.0, Math.cos(i*10.0/180.0*Math.PI), u_lin2, 0.75];
-        vert3[i+73] = [Math.sin(i*10.0/180.0*Math.PI),-1.0, Math.cos(i*10.0/180.0*Math.PI), Math.sin(i*10.0/180.0*Math.PI), 0.0, Math.cos(i*10.0/180.0*Math.PI), u_lin2, 0.5];
-        vert3[i+109] = [Math.sin(i*10.0/180.0*Math.PI),-1.0, Math.cos(i*10.0/180.0*Math.PI), 0.0, -1.0, 0.0, u_low, v_low];
-
+    // Top circle
+    for (i = 0; i < 36; i++) {
+        x = Math.sin(i/18.0*Math.PI);
+        z = Math.cos(i/18.0*Math.PI)
+        vert3[k++] = [x, 1.5, z, 0.0, 1.0, 0.0, 0.625 + z * 0.125, 0.875 + x* 0.125];
+        //x y inverted to match assignment UV
     }
-    vert3[145] = [0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.875, 0.875];
-    ////// Creates indices
+
+    // Top Center - unroll the texture
+    for (i = 0; i <= 36; i++) {
+        x = Math.sin(i/18.0*Math.PI);
+        y = 1.5;
+        z = Math.cos(i/18.0*Math.PI);
+        norm = computeCilNorm(i)
+        vert3[k++] = [x, y, z, norm[0], norm[1], norm[2], 0.5 + position, 0.75];
+
+        position = position + dparts;
+    }
+
+    // Bottom Center
+    position = 0;
+    for (i = 0; i <= 36; i++) {
+        x = Math.sin(i/18.0*Math.PI);
+        console.log(x);
+        y = -1.5;
+        z = Math.cos(i/18.0*Math.PI);
+        norm = computeCilNorm(i)
+        vert3[k++] = [x, y, z, norm[0], norm[1], norm[2], 0.5 + position, 0.5];
+        position = position + dparts;
+    }
+
+    // Bottom Circle
+    for (i = 0; i < 36; i++) {
+        x = Math.sin(i/18.0*Math.PI);
+        z = Math.cos(i/18.0*Math.PI)
+        vert3[k++] = [x, -1.5, z, 0.0, -1.0, 0.0, 0.875 + x * 0.125, 0.875 + z * 0.125];
+    }
+    vert3[k++] = [0.0, -1.5, 0.0, 0.0, -1.0, 0.0, 0.875, 0.875];
+
     var ind3 = [];
-    //////// Upper part
-    j = 0;
-    for(i = 0; i < 36; i++) {
-        ind3[j++] = 0;
-        ind3[j++] = i + 1;
-        ind3[j++] = (i + 1) % 36 + 1;
+    k = 0;
+    // Top Circle
+    for (i = 0; i < 36; i++) {
+        ind3[k++] = 0;
+        ind3[k++] = i + 1;
+        ind3[k++] = (i + 1) % 36 + 1;
     }
-    //////// Lower part
-    for(i = 0; i < 36; i++) {
-        ind3[j++] = 145;
-        ind3[j++] = (i + 1) % 36 + 109;
-        ind3[j++] = i + 109;
-    }
-    //////// Mid part
-    for(i = 0; i < 36; i++) {
-        ind3[j++] = i + 73;
-        ind3[j++] = (i + 1) % 36 + 37;
-        ind3[j++] = i + 37;
 
-        ind3[j++] = (i + 1) % 36 + 37;
-        ind3[j++] = i + 73;
-        ind3[j++] = (i + 1) % 36 + 73;
+    // Center rect
+    for ( i = 0; i<36; i++) {
+        ind3[k++] = i + 37*2
+        ind3[k++] = (i + 1) + 37;
+        ind3[k++] = i + 37;
+
+        ind3[k++] = (i + 1) + 37;
+        ind3[k++] = i + 37*2;
+        ind3[k++] = (i + 1) + 37*2;
     }
-    var color3 = [1.0, 0.0, 1.0];
+
+    // Lower circle
+    for(i = 0; i < 36; i++) {
+        ind3[k++] = vert3.length -1;
+        ind3[k++] = (i + 1) % 36 + 111;
+        ind3[k++] = i + 111;
+    }
+
+    var color3 = [0.0, 1.0, 1.0];
     addMesh(vert3,ind3, color3);
 
 
