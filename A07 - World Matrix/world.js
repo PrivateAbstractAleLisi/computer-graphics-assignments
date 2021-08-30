@@ -38,8 +38,9 @@ function makeWorldMatrixVariableScale(x, y, z, yaw, pitch, roll, scaleX, scaleY,
 		vS[5]  = scaleY;
 		vS[10] = scaleZ;
 
-
-	var res = utils.multiplyMatrices(Rz, vS);
+	//Rotation should then be performed in between scaling and translation.
+	//scale - z - x - y - translate
+	var res = utils.multiplyMatrices(vS, Rz);
 	res = utils.multiplyMatrices(Rx, res);
 	res = utils.multiplyMatrices(Ry, res);  
 	res = utils.multiplyMatrices(TR, res);

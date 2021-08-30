@@ -73,13 +73,14 @@ function buildGeometry() {
 
 
 	// Draws a filled pentacong (replace the vertices and primitive type)
-	var vert3 = [
+	let c1 = 4*(Math.sqrt(5)-1)/4;
+	let c2 = 4*(Math.sqrt(5)+1)/4;
+	let s1 = 4*(Math.sqrt(10+2*Math.sqrt(5)))/4;
+	let s2 = 4*(Math.sqrt(10-2*Math.sqrt(5)))/4;
 
-		[0,0,0], [0,2,0] ,  [2,0,0] , [1,-2,0], [-1, -2,0], [-2,0,0], [0,2,0]
+	var vert3 = [[0, 0, 1.0], [0.0, 4.0, 1.0], [s1, c1, 1.0], [s2, -c2, 1.0], [-s2, -c2, 1.0], [-s1, c1, 1.0], [0, 4.0, 1.0]];
 
-
-	]
-	addMesh(vert3, "F", [204/255, 255/255, 204/255]);
+	addMesh(vert3, "F", [0.0, 1.0, 0.8]);
 	
 }
 

@@ -5,7 +5,7 @@
 // this function returns the world matrix with the updated rotations.
 // parameters rvx, rvy and rvz contains a value in the degree that how much the object rotates in the given direction.
 
-var ori = new Quaternion();  //keeps track of object orientation
+var orientation = new Quaternion();  //keeps track of object orientation
 
 const speed = 0.5;
 function updateWorld(rvx, rvy, rvz) {
@@ -21,10 +21,10 @@ function updateWorld(rvx, rvy, rvz) {
 	var dZ = new Quaternion(Math.cos(gamma / 2), 0, 0, Math.sin(gamma / 2));
 
 	//mult quaternions like matrices in the right order R = raw(Ry) * pitch(Rx) * roll (Rz)
-	var rot = dY.mul(dX).mul(dZ).mul(ori);
+	var rot = dY.mul(dX).mul(dZ).mul(orientation);
 
 	//save current orientation
-	ori = dY.mul(dX).mul(dZ).mul(ori);
+	orientation = dY.mul(dX).mul(dZ).mul(orientation);
 	
 
 	//generate matrix by converting the quaternion representation into a [16] array matrix representation

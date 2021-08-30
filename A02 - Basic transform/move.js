@@ -6,10 +6,11 @@ function move() {
 			   0.0,		0.0,		0.0,		1.0];
 			   
 	// Rotate of 30 degrees on the x axis
+	let theta = 30 * Math.PI / 180;
 	var R1 =  [1.0,		0.0,		0.0,		0.0,
-			   0.0,		0.8660,		-0.5,		0.0,
-			   0.0,		0.5,		0.8660,		0.0,
-			   0.0,		0.0,		0.0,		1.0];
+		0.0,		Math.cos(theta),		-Math.sin(theta),		0.0,
+		0.0,		Math.sin(theta),		Math.cos(theta),		0.0,
+		0.0,		0.0,		0.0,		1.0];
 			   
 	// Make the object 2 times bigger
 	var S1 =  [2.0,		0.0,		0.0,		0.0,
@@ -23,7 +24,7 @@ function move() {
 			   0.0,		0.0,		2.0,		0.0,
 			   0.0,		0.0,		0.0,		1.0];
 
-	// Mirror over the z axis
+	// Mirror over the y axis (as stated in the html)
 	var S3 =  [-1.0,	0.0,		0.0,		0.0,
 			   0.0,		1.0,		0.0,		0.0,
 			   0.0,		0.0,		-1.0,		0.0,
