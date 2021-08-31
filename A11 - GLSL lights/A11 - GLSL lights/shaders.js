@@ -69,11 +69,10 @@ var S4 = `
 		OlightColor = pow( ( (Target) / length(Pos - fs_pos) ) , Decay) * lightColor;
 `;
 
-// Single spot light (with decay) Ass. ambient color must be considered
+// Single spot light (with decay)
 var S5 = `
 
 	OlightDir =  normalize(Pos - fs_pos); //light direction is computed as the same as for point light
-	ambientColor = ambientLightColor;
 	OlightColor = lightColor * pow( ( (Target) / length(Pos - fs_pos) ) , Decay) * clamp( 
 	
 	(   (dot(normalize(Pos - fs_pos), Dir)   - cos(radians(ConeOut/2.0)) ) / (  cos(radians(ConeIn/2.0))  - cos(radians(ConeOut/2.0))  )

@@ -101,7 +101,7 @@ function buildGeometry() {
     }
 
 
-// Draws a Cylinder --- To do for the assignment
+// Draws a Cylinder
     var vert3 = [[0.0, 1.5, 0.0, 0.0, 1.0, 0.0, 0.625, 0.875]];
     k = 1;
     var dparts = 0.5/36;

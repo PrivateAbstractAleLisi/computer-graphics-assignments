@@ -85,9 +85,9 @@ function buildGeometry() {
     //generate sphere using spherical coordinates
 
     vert3[0] = [0, radius, 0]; //APEX
-    let step = 1;
+
     var pos = 1;
-    for (let theta = step; theta <= 90; ++theta) { //POINTS by CONCENTRIC CIRCLES
+    for (let theta = 1; theta <= 90; ++theta) { //POINTS by CONCENTRIC CIRCLES
         for (let phi = 0; phi < 360; ++phi) {
             vert3[pos] = [radius * Math.sin(theta * Math.PI / 180.0) * Math.sin(phi * Math.PI / 180.0),
                 radius * Math.cos(theta * Math.PI / 180.0),
@@ -95,15 +95,15 @@ function buildGeometry() {
             pos++;
         }
     }
-
-    var lastIndex = pos;
+    vert3[pos] = [0, 0, 0] //lower fan center
+    let lowerCenterPos = pos
 
     //=========== Creates indices ===========
     var ind3 = [];
     var count = 0;
     let index = 1;
 
-    while (index < 360.0 / step) {
+    while (index < 360) {
         ind3[count++] = 0; //apex
         ind3[count++] = index++;
         ind3[count++] = index;
@@ -113,8 +113,8 @@ function buildGeometry() {
     ind3[count++] = index;
     ind3[count++] = 1;
 
-    var i_limit = 90.0 / step; //quanti livelli
-    var j_limit = 360.0 / step; //quanti punti per livello circolare
+    var i_limit = 90; //quanti livelli
+    var j_limit = 360; //quanti punti per livello circolare
     for (i = 1; i < i_limit; i++) {
         for (j = 1; j < j_limit; j++) {
             ind3[count++] = (j_limit * i + j) - j_limit;
@@ -133,6 +133,22 @@ function buildGeometry() {
         ind3[count++] = j_limit * i + 1;
         ind3[count++] = j_limit * i - (j_limit - 1);
     }
+
+    //Bottom triangle fan
+
+    let point = vert3.length - 1;
+
+    //Bottom part
+    for(i = 0; i < 360; i++) {
+        ind3[count++] = point;
+        ind3[count++] = point  - 359 + i;
+        ind3[count++] = point - 360 + i;
+    }
+
+    //last triangle
+    ind3[count++] = point - 1;
+    ind3[count++] = point;
+    ind3[count++] = point - 360;
 
     var color3 = [0.3, 0.45, 0.8];
     addMesh(vert3, ind3, color3);

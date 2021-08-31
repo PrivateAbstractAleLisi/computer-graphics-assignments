@@ -128,20 +128,21 @@ var S5 = `
 
 	//DIFFUSE TOON
 
-	vec4 diffContrA = lightColorA * diffColor  * dot(lightDirA, normalVec)  * (dot(lightDirA, normalVec) > DToonTh ? diffColor : vec4(0,0,0,0));
-	vec4 diffContrB = lightColorB * diffColor * dot(lightDirB, normalVec) * (dot(lightDirB, normalVec) > DToonTh ? diffColor : vec4(0,0,0,0));
-	vec4 diffContrC = lightColorC * diffColor  * dot(lightDirC, normalVec) * (dot(lightDirC, normalVec) > DToonTh ? diffColor : vec4(0,0,0,0));
+	vec4 diffContrA =   dot(lightDirA, normalVec)  > DToonTh ? lightColorA : vec4(0,0,0,0);
+	vec4 diffContrB =   dot(lightDirB, normalVec)  > DToonTh ? lightColorB : vec4(0,0,0,0);
+	vec4 diffContrC =   dot(lightDirC, normalVec)  > DToonTh ? lightColorC : vec4(0,0,0,0);
 	
 
 	//SPECULAR
 
 
-	vec4 specContrA = diffColor  * ((dot(normalVec, normalize(lightDirA + eyedirVec)) ) > SToonTh ?  specularColor : vec4(0,0,0,0)) * lightColorA;
-	vec4 specContrB = diffColor  * ((dot(normalVec, normalize(lightDirB + eyedirVec)) ) > SToonTh ?  specularColor : vec4(0,0,0,0)) * lightColorB;
-	vec4 specContrC = diffColor  * ((dot(normalVec, normalize(lightDirC + eyedirVec)) ) > SToonTh ?  specularColor : vec4(0,0,0,0)) * lightColorC;
+	vec4 specContrA =  ((dot(normalVec, normalize(lightDirA + eyedirVec)) ) > SToonTh ?  lightColorA : vec4(0,0,0,0));
+	vec4 specContrB =  ((dot(normalVec, normalize(lightDirB + eyedirVec)) ) > SToonTh ?  lightColorB : vec4(0,0,0,0));
+	vec4 specContrC =  ((dot(normalVec, normalize(lightDirC + eyedirVec)) ) > SToonTh ?  lightColorC : vec4(0,0,0,0));
 
-	out_color = ambientCo + diffContrA + diffContrB + diffContrC
-	+ specContrA + specContrB + specContrC;
+	out_color =  clamp(
+	(ambientCo + diffColor * (diffContrA + diffContrB + diffContrC)
+	+ specularColor * (specContrA + specContrB + specContrC) ), 0.0, 1.0);
 
 
 

@@ -15,7 +15,14 @@ function crossProduct(av, bv) {
 function normalizeVector(vec) {
 
     magnitude = Math.sqrt(Math.pow(vec[0], 2) + Math.pow(vec[1], 2) + Math.pow(vec[2], 2))
-    return [(vec[0]) / magnitude, Math.abs(vec[1]) / magnitude, (vec[2]) / magnitude]
+    return [(vec[0]) / magnitude, (vec[1]) / magnitude, (vec[2]) / magnitude]
+}
+
+function computeCilNorm (i) {
+    dx = Math.sin(i/18.0*Math.PI);
+    dz = Math.cos(i/18.0*Math.PI);
+    res = [dx, 0.0, dz];
+    return res
 }
 
 //from x in a,b to y in c,d
@@ -119,7 +126,7 @@ function buildGeometry() {
     //============================== SIN COS FUNCTION ===============================//
 
 
-    let granularity = 15;
+    let granularity = 36;
     // Draws function y = sin(x) * cos(z) with -3 <= x <= 3 and -3 <= z <= 3 -- To do for the assignment.
     var vert3 = [];
 
@@ -151,56 +158,63 @@ function buildGeometry() {
 
     // ============================================================================ //
 
-
     // Draws a Cylinder --- To do for the assignment
-
-    //upper and lower centers
     var vert4 = [[0.0, 1.0, 0.0, 0.0, 1.0, 0.0]];
-    vert4[145] = [0.0, -1.0, 0.0, 0.0, -1.0, 0.0];
-
-    {
-        for (i = 0; i < 36; i++) {
-
-            const step = Math.PI * 16.0 * i / 180.0;
-            //upper ring
-            vert4[i + 1] = [Math.sin(step), 1.0, Math.cos(step), 0.0, 1.0, 0.0];
-
-            //upper ring - horizontal normals (perpendicular to the last ones)
-            vert4[i + 37] = [Math.sin(step), 1.0, Math.cos(step), Math.sin(step), 0.0, Math.cos(step)];
-
-            vert4[i + 73] = [Math.sin(step), -1.0, Math.cos(step), Math.sin(step), 0.0, Math.cos(step)];
-            vert4[i + 109] = [Math.sin(step), -1.0, Math.cos(step), 0.0, -1.0, 0.0];
-        }
-
-
-        ////// INDICES ////////
-        var ind4 = [];
-
-        j = 0;
-        for (i = 0; i < 36; i++) { //triangle fan for the upper circle
-            ind4[j++] = 0;
-            ind4[j++] = i + 1;
-            ind4[j++] = (i + 1) % 36 + 1;
-        }
-
-        for (i = 0; i < 36; i++) { //triangle fan for the lower circle
-            ind4[j++] = 145;
-            ind4[j++] = (i + 1) % 36 + 109;
-            ind4[j++] = i + 109;
-        }
-
-        for (i = 0; i < 36; i++) { //body
-            ind4[j++] = i + 73;
-            ind4[j++] = (i + 1) % 36 + 37;
-            ind4[j++] = i + 37;
-
-            ind4[j++] = (i + 1) % 36 + 37;
-            ind4[j++] = i + 73;
-            ind4[j++] = (i + 1) % 36 + 73;
-        }
-        let color4 = [1.0, 0.45, 0.7];
-        addMesh(vert4, ind4, color4);
+    k = 1;
+    // Top circle
+    for (i = 0; i < 36; i++) {
+        vert4[k++] = [Math.sin(i/18.0*Math.PI), 1.0, Math.cos(i/18.0*Math.PI), 0.0, 1.0, 0.0];
     }
+    // Top Center
+    for (i = 0; i < 36; i++) {
+        x = Math.sin(i/18.0*Math.PI);
+        y = 1;
+        z = Math.cos(i/18.0*Math.PI);
+        norm = computeCilNorm(i);
+        vert4[k++] = [x, y, z, norm[0], norm[1], norm[2]];
+    }
+    // Bottom Center
+    for (i = 0; i < 36; i++) {
+        x = Math.sin(i/18.0*Math.PI);
+        y = -1;
+        z = Math.cos(i/18.0*Math.PI);
+        norm = computeCilNorm(i);
+        vert4[k++] = [x, y, z, norm[0], norm[1], norm[2]];
+    }
+    // Bottom Circle
+    for (i = 0; i < 36; i++) {
+        vert4[k++] = [Math.sin(i/18.0*Math.PI), -1.0, Math.cos(i/18.0*Math.PI), 0.0, -1.0, 0.0];
+    }
+    vert4[k++] = [0.0, -1.0, 0.0, 0.0, -1.0, 0.0];
+
+    var ind4 = [];
+    k = 0;
+    // Top Circle
+    for (i = 0; i < 36; i++) {
+        ind4[k++] = 0;
+        ind4[k++] = i + 1;
+        ind4[k++] = (i + 1) % 36 + 1;
+    }
+    // Center rectangolar
+    for(i = 0; i < 36; i++) {
+        ind4[k++] = i + 73;
+        ind4[k++] = (i + 1) % 36 + 37;
+        ind4[k++] = i + 37;
+
+        ind4[k++] = (i + 1) % 36 + 37;
+        ind4[k++] = i + 73;
+        ind4[k++] = (i + 1) % 36 + 73;
+    }
+    // Lower cicrle
+    for(i = 0; i < 36; i++) {
+        ind4[k++] = vert4.length -1;
+        ind4[k++] = (i + 1) % 36 + 109;
+        ind4[k++] = i + 109;
+    }
+
+    var color4 = [1.0, 1.0, 0.0];
+    addMesh(vert4, ind4, color4);
+
 
     // Draws a Sphere --- To do for the assignment.
     {
@@ -216,7 +230,8 @@ function buildGeometry() {
                 x = Math.sin(phi / 180.0 * Math.PI) * Math.sin(theta / 180.0 * Math.PI);
                 y = Math.cos(theta / 180.0 * Math.PI);
                 z = Math.cos(phi / 180.0 * Math.PI) * Math.sin(theta / 180.0 * Math.PI);
-                vert5[cur++] = [x, y, z, x, y, z];
+                let vNorm = normalizeVector([x,y,z])
+                vert5[cur++] = [x, y, z, vNorm[0], vNorm[1], vNorm[2]];
             }
         }
         let last = cur;
