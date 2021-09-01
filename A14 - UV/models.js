@@ -104,7 +104,7 @@ function buildGeometry() {
 // Draws a Cylinder
     var vert3 = [[0.0, 1.5, 0.0, 0.0, 1.0, 0.0, 0.625, 0.875]];
     k = 1;
-    var dparts = 0.5/36;
+    var step = 0.5/36; //how much to move in the texture when unrolling the can label
     var position = 0;
 
     // Top circle
@@ -118,12 +118,12 @@ function buildGeometry() {
     // Top Center - unroll the texture
     for (i = 0; i <= 36; i++) {
         x = Math.sin(i/18.0*Math.PI);
-        y = 1.5;
+        y = 1.5; //cilinder height
         z = Math.cos(i/18.0*Math.PI);
         norm = computeCilNorm(i)
-        vert3[k++] = [x, y, z, norm[0], norm[1], norm[2], 0.5 + position, 0.75];
+        vert3[k++] = [x, y, z, norm[0], norm[1], norm[2], 0.5 + position, 0.75]; //slide through the 'side' from 0.5 to 1
 
-        position = position + dparts;
+        position = position + step;
     }
 
     // Bottom Center
@@ -135,7 +135,7 @@ function buildGeometry() {
         z = Math.cos(i/18.0*Math.PI);
         norm = computeCilNorm(i)
         vert3[k++] = [x, y, z, norm[0], norm[1], norm[2], 0.5 + position, 0.5];
-        position = position + dparts;
+        position = position + step;
     }
 
     // Bottom Circle

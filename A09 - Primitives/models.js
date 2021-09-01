@@ -72,7 +72,7 @@ function buildGeometry() {
 
 
 
-	// Draws a filled pentacong (replace the vertices and primitive type)
+	// Draws a filled pentagon (replace the vertices and primitive type)
 	let c1 = 4*(Math.sqrt(5)-1)/4;
 	let c2 = 4*(Math.sqrt(5)+1)/4;
 	let s1 = 4*(Math.sqrt(10+2*Math.sqrt(5)))/4;
